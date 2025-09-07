@@ -7,6 +7,7 @@ export default defineConfig({
       input: {
         "background/index": "src/background/index.ts",
         "content/index": "src/content/index.ts",
+        "popup/index": "src/popup/index.ts",
       },
       output: {
         entryFileNames: (a) => a.name.replace(/\/index$/, "") + ".js",
