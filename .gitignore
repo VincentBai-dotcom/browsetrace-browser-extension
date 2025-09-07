@@ -1,0 +1,32 @@
+# pnpm
+node_modules/
+pnpm-debug.log*
+.pnpm-store/
+
+# Build outputs (Chrome extension artifacts)
+dist/
+build/
+out/
+*.zip
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+
+# Local env files
+.env
+.env.local
+.env.*.local
+
+# Editor / OS files
+.vscode/
+.idea/
+.DS_Store
+*.swp
+
+# Coverage / testing
+coverage/
+*.lcov
