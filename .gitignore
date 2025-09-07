@@ -30,10 +30,3 @@ logs/
 # Coverage / testing
 coverage/
 *.lcov
-
-# Large files
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.ico
