@@ -19,7 +19,7 @@ async function init() {
 
 // Update button label + status text
 function updateUI(paused: boolean) {
-  if (!pauseBtn || !statusEl) return;
+  console.log("updateing ui");
   pauseBtn.textContent = paused ? "Resume capture" : "Pause capture";
   statusEl.textContent = paused ? "Capture is paused" : "Capture is running";
 }
