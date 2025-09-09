@@ -50,16 +50,16 @@ export function sectionize(container: Element): Element[] {
   const sections: Element[] = [];
 
   const walker = document.createTreeWalker(container, NodeFilter.SHOW_ELEMENT, {
-    acceptNode: (el: Element) => {
-      if (!isLikelyVisible(el)) return NodeFilter.FILTER_SKIP;
-      if (isBoilerplate(el)) return NodeFilter.FILTER_SKIP;
+    acceptNode: (element: Element) => {
+      if (!isLikelyVisible(element)) return NodeFilter.FILTER_SKIP;
+      if (isBoilerplate(element)) return NodeFilter.FILTER_SKIP;
       return NodeFilter.FILTER_ACCEPT;
     },
   });
 
   while (walker.nextNode()) {
-    const el = walker.currentNode as Element;
-    if (isSectionBreak(el)) sections.push(el);
+    const element = walker.currentNode as Element;
+    if (isSectionBreak(element)) sections.push(element);
   }
 
   if (!sections.length) sections.push(container);
@@ -125,11 +125,11 @@ export function chunkParagraphs(
 export function discoverShadowRoots(root: Element, acc: Node[]) {
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
   while (walker.nextNode()) {
-    const el = walker.currentNode as Element;
-    const sr = (el as any).shadowRoot as ShadowRoot | null;
-    if (sr) {
-      acc.push(sr);
-      discoverShadowRoots(sr as unknown as Element, acc);
+    const element = walker.currentNode as Element;
+    const shadowRoot = (element as any).shadowRoot as ShadowRoot | null;
+    if (shadowRoot) {
+      acc.push(shadowRoot);
+      discoverShadowRoots(shadowRoot as unknown as Element, acc);
     }
   }
 }
