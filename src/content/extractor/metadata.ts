@@ -11,15 +11,6 @@ export function collectMetadata(): Record<string, string | string[]> {
     document.querySelector<HTMLLinkElement>("link[rel='canonical']")?.href ||
     location.href;
 
-  const breadcrumbs = Array.from(
-    document.querySelectorAll(
-      '[itemtype*="Breadcrumb"] a, nav[aria-label*="breadcrumb"] a'
-    )
-  )
-    .map((a) => (a as HTMLAnchorElement).textContent?.trim())
-    .filter(Boolean) as string[];
-
-  if (breadcrumbs.length) meta.breadcrumbs = breadcrumbs;
   return meta;
 }
 
