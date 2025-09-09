@@ -5,7 +5,6 @@ export type PageCapture = {
   capturedAt: number;
   lang?: string;
   meta: Record<string, string | string[]>;
-  schemaOrg?: unknown[];
   blocks: ContentBlock[];
 };
 

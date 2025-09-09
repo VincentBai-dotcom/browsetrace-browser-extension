@@ -1,6 +1,6 @@
 import type { PageCapture } from "../../shared/types";
 import type { RawBlock } from "./blocks";
-import { collectMetadata, collectStructuredData } from "./metadata";
+import { collectMetadata } from "./metadata";
 import { postprocessBlocks } from "./postprocess";
 import { discoverShadowRoots, extractBlocksFromDOM } from "./traversal";
 
@@ -12,7 +12,6 @@ export async function extractPage(): Promise<PageCapture> {
   const lang = document.documentElement.lang || undefined;
 
   const meta = collectMetadata();
-  const schemaOrg = collectStructuredData();
 
   const roots: Node[] = [document];
   discoverShadowRoots(document.documentElement, roots);
@@ -31,7 +30,6 @@ export async function extractPage(): Promise<PageCapture> {
     capturedAt: now,
     lang: lang ?? "",
     meta,
-    schemaOrg,
     blocks,
   };
 }

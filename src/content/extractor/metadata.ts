@@ -13,18 +13,3 @@ export function collectMetadata(): Record<string, string | string[]> {
 
   return meta;
 }
-
-export function collectStructuredData(): unknown[] {
-  const out: unknown[] = [];
-  for (const s of document.querySelectorAll<HTMLScriptElement>(
-    'script[type="application/ld+json"]'
-  )) {
-    try {
-      const json = JSON.parse(s.textContent || "null");
-      if (json) out.push(json);
-    } catch {
-      /* ignore */
-    }
-  }
-  return out;
-}
