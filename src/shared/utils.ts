@@ -13,10 +13,10 @@ export function estimateTokens(s: string): number {
 }
 
 // Compact CSS path (best effort; stable enough for anchors)
-export function cssPath(el: Element): string {
-  if (el.id) return `#${cssEscape(el.id)}`;
+export function cssPath(element: Element): string {
+  if (element.id) return `#${cssEscape(element.id)}`;
   const parts: string[] = [];
-  let cur: Element | null = el;
+  let cur: Element | null = element;
   while (cur && cur.nodeType === Node.ELEMENT_NODE && parts.length < 6) {
     const name = cur.tagName.toLowerCase();
     const nth = indexAmongType(cur);
@@ -26,14 +26,14 @@ export function cssPath(el: Element): string {
   return parts.join(">");
 }
 
-function indexAmongType(el: Element): number {
-  const tag = el.tagName;
+function indexAmongType(element: Element): number {
+  const tag = element.tagName;
   let i = 0,
     idx = 0;
-  for (const sib of el.parentElement?.children || []) {
+  for (const sib of element.parentElement?.children || []) {
     if ((sib as Element).tagName === tag) {
       i++;
-      if (sib === el) idx = i;
+      if (sib === element) idx = i;
     }
   }
   return idx || 1;

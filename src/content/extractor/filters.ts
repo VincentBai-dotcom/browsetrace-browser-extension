@@ -1,15 +1,20 @@
-export function isLikelyVisible(el: Element): boolean {
-  const cs = getComputedStyle(el);
-  if (cs.display === "none" || cs.visibility === "hidden" || (el as any).hidden)
+export function isLikelyVisible(element: Element): boolean {
+  const cs = getComputedStyle(element);
+  if (
+    cs.display === "none" ||
+    cs.visibility === "hidden" ||
+    (element as any).hidden
+  ) {
     return false;
+  }
   return true;
 }
 
-export function isBoilerplate(el: Element): boolean {
-  const tag = el.tagName.toLowerCase();
+export function isBoilerplate(element: Element): boolean {
+  const tag = element.tagName.toLowerCase();
   if (["nav", "aside", "footer"].includes(tag)) return true;
 
-  const cls = (el.className?.toString() || "").toLowerCase();
+  const cls = (element.className?.toString() || "").toLowerCase();
   if (
     cls.includes("cookie") ||
     cls.includes("consent") ||
@@ -20,15 +25,15 @@ export function isBoilerplate(el: Element): boolean {
   return false;
 }
 
-export function isSectionBreak(el: Element): boolean {
-  const tag = el.tagName.toLowerCase();
+export function isSectionBreak(element: Element): boolean {
+  const tag = element.tagName.toLowerCase();
   if (tag === "article" || tag === "section") return true;
   if (/^h[1-6]$/.test(tag)) return true;
   return false;
 }
 
-export function isTextHost(el: Element): boolean {
-  const tag = el.tagName.toLowerCase();
+export function isTextHost(element: Element): boolean {
+  const tag = element.tagName.toLowerCase();
   if (
     [
       "p",
@@ -47,6 +52,6 @@ export function isTextHost(el: Element): boolean {
     ].includes(tag)
   )
     return true;
-  if (el.closest("header, nav, aside, footer")) return false;
+  if (element.closest("header, nav, aside, footer")) return false;
   return true;
 }
