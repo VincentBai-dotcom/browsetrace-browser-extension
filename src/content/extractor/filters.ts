@@ -25,11 +25,44 @@ export function isBoilerplate(element: Element): boolean {
   return false;
 }
 
-export function isSectionBreak(element: Element): boolean {
+export function isSemanticContentElement(element: Element): boolean {
   const tag = element.tagName.toLowerCase();
-  if (tag === "article" || tag === "section") return true;
-  if (/^h[1-6]$/.test(tag)) return true;
-  return false;
+
+  // Content-bearing semantic elements
+  const contentTags = [
+    "article",
+    "section",
+    "main",
+    "aside",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "p",
+    "blockquote",
+    "pre",
+    "code",
+    "ul",
+    "ol",
+    "li",
+    "dl",
+    "dt",
+    "dd",
+    "table",
+    "thead",
+    "tbody",
+    "tr",
+    "td",
+    "th",
+    "figure",
+    "figcaption",
+    "details",
+    "summary",
+  ];
+
+  return contentTags.includes(tag);
 }
 
 export function isTextHost(element: Element): boolean {

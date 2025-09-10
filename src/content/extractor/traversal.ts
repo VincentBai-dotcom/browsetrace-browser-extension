@@ -3,91 +3,100 @@ import {
   isLikelyVisible,
   isBoilerplate,
   isTextHost,
-  isSemanticSection,
+  isSemanticContentElement,
 } from "./filters";
 import type { RawBlock } from "./blocks";
 
 export function extractBlocksFromDOM(scope: Element, sink: RawBlock[]) {
-  // Skip invisible/boilerplate roots early
-  if (!isLikelyVisible(scope)) return;
+  // Step 1: Create a cleaned content tree
+  const contentTree = pruneToContentElements(scope);
+  if (!contentTree) return;
 
+  // Step 2: Extract text blocks from the cleaned tree
+  const textBlocks = extractTextBlocks(contentTree);
+
+  // Step 3: Convert to RawBlocks
   let order = 0;
-
-  // Single segmentation pass (no shadow root handling)
-  const sections = sectionize(scope);
-  for (const sec of sections) {
-    const paragraphs = collectParagraphs(sec);
-    const chunks = chunkParagraphs(paragraphs, {
-      maxChars: 1200,
-      minChars: 200,
-    });
-
-    for (const text of chunks) {
-      if (!text) continue;
+  for (const block of textBlocks) {
+    if (block.text.length >= 200) {
+      // min length check
       sink.push({
-        node: sec,
-        sectionPath: cssPath(sec),
-        text,
+        node: block.element,
+        sectionPath: cssPath(block.element),
+        text: block.text,
         orderHint: order++,
       });
     }
   }
 }
 
-function sectionize(container: Element): Element[] {
-  const sections: Element[] = [];
+function pruneToContentElements(element: Element): Element | null {
+  // Skip invisible or boilerplate elements entirely
+  if (!isLikelyVisible(element) || isBoilerplate(element)) {
+    return null;
+  }
 
-  const walker = document.createTreeWalker(container, NodeFilter.SHOW_ELEMENT, {
-    acceptNode: (element: Element) => {
-      if (!isLikelyVisible(element)) return NodeFilter.FILTER_SKIP;
-      if (isBoilerplate(element)) return NodeFilter.FILTER_SKIP;
-      return NodeFilter.FILTER_ACCEPT;
-    },
-  });
+  // Clone the element
+  const cloned = element.cloneNode(false) as Element;
 
-  while (walker.nextNode()) {
-    const element = walker.currentNode as Element;
-    if (isSemanticSection(element)) {
-      sections.push(element);
+  // Process children
+  for (const child of Array.from(element.children)) {
+    const prunedChild = pruneToContentElements(child);
+    if (prunedChild) {
+      cloned.appendChild(prunedChild);
     }
   }
 
-  // Fallback: if no semantic sections found, use the container
-  if (!sections.length) sections.push(container);
-  return sections.slice(0, 200);
-}
-
-export function collectParagraphs(section: Element): string[] {
-  const parts: string[] = [];
-  const walker = document.createTreeWalker(section, NodeFilter.SHOW_TEXT, {
-    acceptNode: (n: Node) => {
-      const p = n.parentElement;
-      if (!p) return NodeFilter.FILTER_REJECT;
-      if (!isTextHost(p)) return NodeFilter.FILTER_REJECT;
-      if (!isLikelyVisible(p)) return NodeFilter.FILTER_REJECT;
-      const t = n.textContent?.trim();
-      if (!t) return NodeFilter.FILTER_REJECT;
-      if (t.length < 2) return NodeFilter.FILTER_REJECT;
-      return NodeFilter.FILTER_ACCEPT;
-    },
-  });
-
-  const buffer: string[] = [];
-  while (walker.nextNode()) {
-    buffer.push(
-      (walker.currentNode.textContent || "").replace(/\s+/g, " ").trim()
-    );
+  // Keep text content
+  for (const node of Array.from(element.childNodes)) {
+    if (node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) {
+      cloned.appendChild(node.cloneNode(true));
+    }
   }
 
-  const merged = buffer
-    .join(" ")
-    .replace(/\s{2,}/g, " ")
-    .trim();
-  if (merged) parts.push(merged);
-  return parts;
+  // Only keep elements that either:
+  // 1. Have meaningful text content, OR
+  // 2. Are semantic content containers, OR
+  // 3. Have content-bearing children
+  const hasTextContent =
+    !!cloned.textContent && cloned.textContent.trim().length > 0;
+  const isContentContainer = isSemanticContentElement(cloned);
+  const hasChildren = cloned.children.length > 0;
+
+  if (hasTextContent || isContentContainer || hasChildren) {
+    return cloned;
+  }
+
+  return null;
 }
 
-export function chunkParagraphs(
+function extractTextBlocks(
+  element: Element
+): Array<{ element: Element; text: string }> {
+  const blocks: Array<{ element: Element; text: string }> = [];
+
+  // If this element has significant direct text content, it's a block
+  const directText = getDirectTextContent(element);
+  if (directText.length >= 50) {
+    // minimum meaningful text
+    blocks.push({ element, text: directText });
+    return blocks; // Don't recurse if we found text here
+  }
+
+  // Otherwise, recurse into children
+  for (const child of Array.from(element.children)) {
+    blocks.push(...extractTextBlocks(child));
+  }
+
+  return blocks;
+}
+
+function getDirectTextContent(element: Element): string {
+  // Get text content but normalize whitespace
+  return element.textContent?.replace(/\s+/g, " ").trim() || "";
+}
+
+function chunkParagraphs(
   paras: string[],
   opts: { maxChars: number; minChars: number }
 ): string[] {
