@@ -2,7 +2,7 @@ import type { PageCapture } from "../../shared/types";
 import type { RawBlock } from "./blocks";
 import { collectMetadata } from "./metadata";
 import { postprocessBlocks } from "./postprocess";
-import { discoverShadowRoots, extractBlocksFromDOM } from "./traversal";
+import { extractBlocksFromDOM } from "./traversal";
 
 export async function extractPage(): Promise<PageCapture> {
   const now = Date.now();
@@ -13,12 +13,11 @@ export async function extractPage(): Promise<PageCapture> {
 
   const meta = collectMetadata();
 
-  const roots: Node[] = [document];
-  discoverShadowRoots(document.documentElement, roots);
-
   const rawBlocks: RawBlock[] = [];
-  for (const root of roots) {
-    extractBlocksFromDOM(root as Document | Element, rawBlocks);
+  // Start from a single scope root; shadow DOM handled inside extractBlocksFromDOM
+  const scope = pickScopeRoot(document);
+  if (scope) {
+    extractBlocksFromDOM(scope, rawBlocks);
   }
 
   const blocks = postprocessBlocks(rawBlocks, { url });
@@ -32,4 +31,13 @@ export async function extractPage(): Promise<PageCapture> {
     meta,
     blocks,
   };
+}
+
+function pickScopeRoot(doc: Document): Element | null {
+  return (
+    doc.querySelector<HTMLElement>("main, [role='main']") ??
+    doc.body ??
+    doc.documentElement ??
+    null
+  );
 }

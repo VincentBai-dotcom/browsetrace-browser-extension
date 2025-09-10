@@ -2,51 +2,39 @@ import { cssPath } from "../../shared/utils"; // adjust path if you use TS paths
 import {
   isLikelyVisible,
   isBoilerplate,
-  isSectionBreak,
   isTextHost,
+  isSemanticSection,
 } from "./filters";
 import type { RawBlock } from "./blocks";
 
-export function extractBlocksFromDOM(
-  root: Document | Element,
-  sink: RawBlock[]
-) {
-  const containers = pickContentContainers(root);
+export function extractBlocksFromDOM(scope: Element, sink: RawBlock[]) {
+  // Skip invisible/boilerplate roots early
+  if (!isLikelyVisible(scope)) return;
 
   let order = 0;
-  for (const container of containers) {
-    const sections = sectionize(container);
-    for (const sec of sections) {
-      const paragraphs = collectParagraphs(sec);
-      const chunks = chunkParagraphs(paragraphs, {
-        maxChars: 1200,
-        minChars: 200,
+
+  // Single segmentation pass (no shadow root handling)
+  const sections = sectionize(scope);
+  for (const sec of sections) {
+    const paragraphs = collectParagraphs(sec);
+    const chunks = chunkParagraphs(paragraphs, {
+      maxChars: 1200,
+      minChars: 200,
+    });
+
+    for (const text of chunks) {
+      if (!text) continue;
+      sink.push({
+        node: sec,
+        sectionPath: cssPath(sec),
+        text,
+        orderHint: order++,
       });
-      for (const text of chunks) {
-        if (!text) continue;
-        sink.push({
-          node: sec,
-          sectionPath: cssPath(sec),
-          text,
-          orderHint: order++,
-        });
-      }
     }
   }
 }
 
-export function pickContentContainers(root: Document | Element): Element[] {
-  const list = [
-    ...(root instanceof Document
-      ? Array.from(root.querySelectorAll("main, article"))
-      : [root]),
-  ];
-  if (!list.length && root instanceof Document && root.body)
-    list.push(root.body);
-  return list.filter(isLikelyVisible).slice(0, 8);
-}
-
-export function sectionize(container: Element): Element[] {
+function sectionize(container: Element): Element[] {
   const sections: Element[] = [];
 
   const walker = document.createTreeWalker(container, NodeFilter.SHOW_ELEMENT, {
@@ -59,9 +47,12 @@ export function sectionize(container: Element): Element[] {
 
   while (walker.nextNode()) {
     const element = walker.currentNode as Element;
-    if (isSectionBreak(element)) sections.push(element);
+    if (isSemanticSection(element)) {
+      sections.push(element);
+    }
   }
 
+  // Fallback: if no semantic sections found, use the container
   if (!sections.length) sections.push(container);
   return sections.slice(0, 200);
 }
@@ -120,16 +111,4 @@ export function chunkParagraphs(
   }
   if (cur.length >= Math.min(80, minChars)) out.push(cur);
   return out;
-}
-
-export function discoverShadowRoots(root: Element, acc: Node[]) {
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
-  while (walker.nextNode()) {
-    const element = walker.currentNode as Element;
-    const shadowRoot = (element as any).shadowRoot as ShadowRoot | null;
-    if (shadowRoot) {
-      acc.push(shadowRoot);
-      discoverShadowRoots(shadowRoot as unknown as Element, acc);
-    }
-  }
 }
