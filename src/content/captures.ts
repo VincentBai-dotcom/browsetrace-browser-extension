@@ -7,6 +7,7 @@ export function registerNavigation() {
 
   const _push = history.pushState;
   history.pushState = function (...args) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     _push.apply(this, args as any);
     const to = location.href;
     if (to !== last) emit("navigate", { from: last, to });

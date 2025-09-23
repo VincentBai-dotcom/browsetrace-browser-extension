@@ -2,7 +2,7 @@ import { BATCH_MS, BATCH_SIZE, MAX_BUFFER } from "./config";
 import type { EventPayload } from "./types";
 import { getPort } from "./port";
 
-let buf: EventPayload[] = [];
+const buf: EventPayload[] = [];
 let flushTimer: number | null = null;
 
 export function safePush(e: EventPayload) {

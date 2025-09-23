@@ -11,7 +11,9 @@ export function getPort(): chrome.runtime.Port {
       if (!port)
         try {
           port = chrome.runtime.connect(undefined, { name: PORT_NAME });
-        } catch {}
+        } catch {
+          console.log("connection failed.");
+        }
     }, 1000);
   });
   return port;
