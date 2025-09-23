@@ -1,6 +1,14 @@
-import { extractPage } from "./extractor/extractPage.js";
+import { scheduleFlush } from './buffer';
+import {
+  registerNavigation, registerClicks, registerInputs,
+  registerScroll, registerFocus, registerVisibleText
+} from './captures';
 
-export { extractPage };
-
-// Content script for BrowseTrace extension
-console.log("BrowseTrace content script loaded");
+// boot
+registerNavigation();
+registerClicks();
+registerInputs();
+registerScroll();
+registerFocus();
+registerVisibleText();
+scheduleFlush();

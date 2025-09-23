@@ -1,0 +1,4 @@
+export const BATCH_SIZE = 100;
+export const BATCH_MS = 2000;
+export const MAX_BUFFER = 2000;
+export const PORT_NAME = 'events';
