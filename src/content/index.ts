@@ -1,8 +1,12 @@
-import { scheduleFlush } from './buffer';
+import { scheduleFlush } from "./buffer";
 import {
-  registerNavigation, registerClicks, registerInputs,
-  registerScroll, registerFocus, registerVisibleText
-} from './captures';
+  registerNavigation,
+  registerClicks,
+  registerInputs,
+  registerScroll,
+  registerFocus,
+  registerVisibleText,
+} from "./captures";
 
 // boot
 registerNavigation();
