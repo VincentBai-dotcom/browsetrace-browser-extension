@@ -5,8 +5,8 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "pnpm eslint . && pnpm exec prettier . --write && vite build --watch",
-    "build": "pnpm eslint . && pnpm exec prettier . --write && vite build",
+    "dev": "pnpm exec prettier . --write && pnpm eslint . && vite build --watch",
+    "build": "pnpm exec prettier . --write && pnpm eslint . && vite build",
     "preview": "vite preview",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
