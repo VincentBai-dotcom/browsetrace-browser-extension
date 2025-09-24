@@ -13,6 +13,7 @@ export function registerNavigation() {
     if (to !== last) emit("navigate", { from: last, to });
     last = to;
   };
+
   addEventListener("popstate", () => {
     const to = location.href;
     emit("navigate", { from: last, to });
@@ -25,10 +26,10 @@ export function registerClicks() {
   addEventListener(
     "click",
     (e) => {
-      const t = e.target as Element | null;
-      if (!t) return;
-      const selector = cssPath(t);
-      const text = (t as HTMLElement).innerText?.slice(0, 120) ?? "";
+      const target = e.target as Element | null;
+      if (!target) return;
+      const selector = cssPath(target);
+      const text = (target as HTMLElement).innerText?.slice(0, 120) ?? "";
       emit("click", { selector, text });
     },
     { capture: true },
@@ -69,16 +70,25 @@ export function registerScroll() {
 
 // focus/blur
 export function registerFocus() {
-  addEventListener("focus", () => emit("focus", { state: "focused" }), true);
-  addEventListener("blur", () => emit("focus", { state: "blurred" }), true);
+  addEventListener(
+    "focus",
+    (e) => {
+      const target = e.target as HTMLInputElement | HTMLTextAreaElement | null;
+      if (!target) return;
+      emit("focus", {
+        selector: cssPath(target),
+        value: maskInputValue(target),
+      });
+    },
+    true,
+  );
 }
 
 // visible text (light snapshot)
 export function registerVisibleText() {
   const snap = () => {
-    const text = document.body?.innerText?.slice(0, 4000) ?? "";
+    const text = document.body?.innerText ?? "";
     if (text.trim()) emit("visible_text", { text });
   };
   addEventListener("DOMContentLoaded", snap);
-  addEventListener("load", snap);
 }

@@ -23,12 +23,14 @@ export function cssPath(element: Element): string {
   if (element.id) return `#${element.id}`;
   const parts: string[] = [];
   for (
-    let e: Element | null = element;
-    e && parts.length < 5;
-    e = e.parentElement
+    let tempElement: Element | null = element;
+    tempElement && parts.length < 5;
+    tempElement = tempElement.parentElement
   ) {
-    let s = e.tagName.toLowerCase();
-    if (e.classList.length) s += "." + [...e.classList].slice(0, 2).join(".");
+    let s = tempElement.tagName.toLowerCase();
+    if (tempElement.classList.length) {
+      s += "." + [...tempElement.classList].slice(0, 2).join(".");
+    }
     parts.unshift(s);
   }
   return parts.join(" > ");

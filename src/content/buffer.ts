@@ -34,6 +34,6 @@ export function flush() {
     getPort().postMessage({ type: "batch", events: batch });
   } catch {
     /* retry later */
-    console.log("Failed to send to service worker")
+    console.log("Failed to send to service worker");
   }
 }
