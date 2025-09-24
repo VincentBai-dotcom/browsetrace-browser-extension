@@ -1,14 +1,14 @@
 import type { EventPayload, EventType } from "./types";
 import { safePush } from "./buffer";
 
-export function now() {
-  const d = new Date();
-  return { ts_utc: d.getTime(), ts_iso: d.toISOString() };
+export function getTimestamps() {
+  const date = new Date();
+  return { ts_utc: date.getTime(), ts_iso: date.toISOString() };
 }
 
 export function emit(type: EventType, data: Record<string, unknown>) {
-  const { ts_utc, ts_iso } = now();
-  const e: EventPayload = {
+  const { ts_utc, ts_iso } = getTimestamps();
+  const eventPayload: EventPayload = {
     ts_utc,
     ts_iso,
     url: location.href,
@@ -16,13 +16,17 @@ export function emit(type: EventType, data: Record<string, unknown>) {
     type,
     data,
   };
-  safePush(e);
+  safePush(eventPayload);
 }
 
-export function cssPath(el: Element): string {
-  if (el.id) return `#${el.id}`;
+export function cssPath(element: Element): string {
+  if (element.id) return `#${element.id}`;
   const parts: string[] = [];
-  for (let e: Element | null = el; e && parts.length < 5; e = e.parentElement) {
+  for (
+    let e: Element | null = element;
+    e && parts.length < 5;
+    e = e.parentElement
+  ) {
     let s = e.tagName.toLowerCase();
     if (e.classList.length) s += "." + [...e.classList].slice(0, 2).join(".");
     parts.unshift(s);
@@ -31,13 +35,13 @@ export function cssPath(el: Element): string {
 }
 
 export function maskInputValue(
-  el: HTMLInputElement | HTMLTextAreaElement,
+  element: HTMLInputElement | HTMLTextAreaElement,
 ): string {
-  const t = (el.type || "").toLowerCase();
-  const val = el.value ?? "";
+  const t = (element.type || "").toLowerCase();
+  const val = element.value ?? "";
   const sensitive =
     /password|email|tel|number|search/i.test(t) ||
-    el.autocomplete === "one-time-code";
+    element.autocomplete === "one-time-code";
   if (sensitive) return mask(val);
   return val.length > 64 ? val.slice(0, 61) + "..." : val;
 }

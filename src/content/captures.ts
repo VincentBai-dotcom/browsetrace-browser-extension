@@ -40,9 +40,12 @@ export function registerInputs() {
   addEventListener(
     "input",
     (e) => {
-      const t = e.target as HTMLInputElement | HTMLTextAreaElement | null;
-      if (!t) return;
-      emit("input", { selector: cssPath(t), value: maskInputValue(t) });
+      const target = e.target as HTMLInputElement | HTMLTextAreaElement | null;
+      if (!target) return;
+      emit("input", {
+        selector: cssPath(target),
+        value: maskInputValue(target),
+      });
     },
     { capture: true },
   );
@@ -54,9 +57,9 @@ export function registerScroll() {
   addEventListener(
     "scroll",
     () => {
-      const n = performance.now();
-      if (n - last > 250) {
-        last = n;
+      const now = performance.now();
+      if (now - last > 250) {
+        last = now;
         emit("scroll", { y: scrollY | 0 });
       }
     },

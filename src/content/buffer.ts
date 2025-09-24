@@ -5,9 +5,9 @@ import { getPort } from "./port";
 const buf: EventPayload[] = [];
 let flushTimer: number | null = null;
 
-export function safePush(e: EventPayload) {
+export function safePush(eventPayload: EventPayload) {
   if (buf.length >= MAX_BUFFER) buf.splice(0, buf.length - MAX_BUFFER + 1);
-  buf.push(e);
+  buf.push(eventPayload);
   scheduleFlush();
 }
 
