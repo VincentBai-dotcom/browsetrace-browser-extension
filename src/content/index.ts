@@ -8,6 +8,8 @@ import {
   registerVisibleText,
 } from "./captures";
 
+console.log("Loading content script...");
+
 // boot
 registerNavigation();
 registerClicks();
@@ -16,3 +18,5 @@ registerScroll();
 registerFocus();
 registerVisibleText();
 scheduleFlush();
+
+console.log("Content script loaded!");

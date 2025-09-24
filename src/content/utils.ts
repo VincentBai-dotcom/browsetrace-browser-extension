@@ -16,6 +16,7 @@ export function emit(type: EventType, data: Record<string, unknown>) {
     type,
     data,
   };
+  // console.log(eventPayload);
   safePush(eventPayload);
 }
 
