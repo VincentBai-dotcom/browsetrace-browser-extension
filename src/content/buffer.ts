@@ -6,14 +6,21 @@ const buf: EventPayload[] = [];
 let flushTimer: number | null = null;
 
 export function safePush(eventPayload: EventPayload) {
-  if (buf.length >= MAX_BUFFER) buf.splice(0, buf.length - MAX_BUFFER + 1);
+  if (buf.length >= MAX_BUFFER) {
+    buf.splice(0, buf.length - MAX_BUFFER + 1);
+  }
   buf.push(eventPayload);
   scheduleFlush();
 }
 
 export function scheduleFlush() {
-  if (buf.length >= BATCH_SIZE) return flush();
-  if (flushTimer != null) return;
+  if (buf.length >= BATCH_SIZE) {
+    flush();
+    return;
+  }
+  if (flushTimer != null) {
+    return;
+  }
   flushTimer = window.setTimeout(() => {
     flushTimer = null;
     flush();
@@ -27,5 +34,6 @@ export function flush() {
     getPort().postMessage({ type: "batch", events: batch });
   } catch {
     /* retry later */
+    console.log("Failed to send to service worker")
   }
 }
