@@ -1,4 +1,4 @@
-import type { EventPayload, EventType } from "./types";
+import type { EventPayload, EventType } from "../shared/types";
 import { safePush } from "./buffer";
 
 export function getTimestamps() {

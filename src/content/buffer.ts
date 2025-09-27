@@ -1,5 +1,5 @@
 import { BATCH_MS, BATCH_SIZE, MAX_BUFFER } from "./config";
-import type { EventPayload } from "./types";
+import type { EventPayload } from "../shared/types";
 import { getPort } from "./port";
 
 const buf: EventPayload[] = [];

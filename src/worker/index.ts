@@ -1,4 +1,4 @@
-import type { EventPayload } from "../content/types";
+import type { EventPayload } from "../shared/types";
 
 // Background script for BrowseTrace extension
 console.log("BrowseTrace background script loaded");
@@ -14,6 +14,7 @@ const ENDPOINT = "http://127.0.0.1:8123/events";
  */
 async function sendToLocalhost(payload: { events: EventPayload[] }) {
   try {
+    console.log(payload);
     await fetch(ENDPOINT, {
       method: "POST",
       mode: "no-cors",
