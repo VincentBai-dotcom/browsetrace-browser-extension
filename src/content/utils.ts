@@ -6,7 +6,13 @@ export function getTimestamps() {
   return { ts_utc: date.getTime(), ts_iso: date.toISOString() };
 }
 
-export function emit(type: EventType, data: Record<string, unknown>) {
+export async function emit(type: EventType, data: Record<string, unknown>) {
+  // Check if capture is paused
+  const { paused = false } = await chrome.storage.local.get("paused");
+  if (paused) return;
+
+  console.log("emit", type, data);
+
   const { ts_utc, ts_iso } = getTimestamps();
   const eventPayload: EventPayload = {
     ts_utc,

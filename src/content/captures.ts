@@ -30,7 +30,6 @@ export function registerClicks() {
       if (!target) return;
       const selector = cssPath(target);
       const text = (target as HTMLElement).innerText?.slice(0, 120) ?? "";
-      console.log({ selector, text });
       emit("click", { selector, text });
     },
     { capture: true },
