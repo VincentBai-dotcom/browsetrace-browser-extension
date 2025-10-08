@@ -4,7 +4,7 @@ import tseslint from "typescript-eslint";
 import { defineConfig } from "eslint/config";
 import eslintConfigPrettier from "eslint-config-prettier/flat";
 
-export default defineConfig([
+const config: ReturnType<typeof defineConfig> = defineConfig([
   {
     ignores: [
       "dist/**", // vite build
@@ -19,3 +19,5 @@ export default defineConfig([
   tseslint.configs.recommended,
   eslintConfigPrettier,
 ]);
+
+export default config;
